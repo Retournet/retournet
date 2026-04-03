@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retournet — Le feedback que les candidats méritent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff; --bg-secondary: #F7F6F2; --text: #1a1a18;
+      --text-secondary: #5F5E5A; --text-tertiary: #888780;
+      --border: rgba(0,0,0,0.12); --border-hover: rgba(0,0,0,0.25);
+      --accent: #D85A30; --accent-light: #FAECE7; --accent-dark: #993C1D;
+      --green: #0F6E56; --green-light: #E1F5EE;
+      --blue: #185FA5; --blue-light: #E6F1FB;
+      --amber: #EF9F27; --amber-light: #FAEEDA;
+      --radius-md: 8px; --radius-lg: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a; --bg-secondary: #242422; --text: #F1EFE8;
+        --text-secondary: #B4B2A9; --text-tertiary: #888780;
+        --border: rgba(255,255,255,0.12); --border-hover: rgba(255,255,255,0.28);
+        --accent: #F0997B; --accent-light: #4A1B0C; --accent-dark: #F5C4B3;
+        --green: #5DCAA5; --green-light: #04342C;
+        --blue: #85B7EB; --blue-light: #042C53;
+        --amber: #EF9F27; --amber-light: #412402;
+      }
+    }
+    body { font-family: 'DM Sans', sans-serif; font-size: 16px; color: var(--text); background: var(--bg); line-height: 1.6; }
+
+    /* NAV */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 2.5rem; border-bottom: 0.5px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 200; }
+    .logo { font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -0.5px; color: var(--text); cursor: pointer; }
+    .logo span { color: var(--accent); font-style: italic; }
+    .nav-links { display: flex; gap: 1.5rem; font-size: 14px; color: var(--text-secondary); list-style: none; }
+    .nav-links a { text-decoration: none; color: inherit; transition: color 0.15s; cursor: pointer; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); font-weight: 500; }
+    .btn-nav { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 8px 18px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-md); background: transparent; color: var(--text); cursor: pointer; transition: background 0.15s; }
+    .btn-nav:hover { background: var(--bg-secondary); }
+
+    /* PAGES */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* BOUTONS */
+    .btn-primary { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; padding: 12px 24px; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius-md); cursor: pointer; transition: opacity 0.15s; }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-secondary { font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 12px 24px; background: transparent; color: var(--text-secondary); border: 0.5px solid var(--border-hover); border-radius: var(--radius-md); cursor: pointer; transition: background 0.15s; }
+    .btn-secondary:hover { background: var(--bg-secondary); }
+    .btn-green { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; padding: 12px 24px; background: var(--green); color: white; border: none; border-radius: var(--radius-md); cursor: pointer; }
+    .btn-green:hover { opacity: 0.88; }
+
+    /* CARTES AVIS */
+    .review-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; margin-bottom: 10px; transition: border-color 0.15s; }
+    .review-card:hover { border-color: var(--border-hover); }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+    .card-company { font-size: 13px; font-weight: 500; }
+    .card-meta-sub { font-size: 12px; color: var(--text-secondary); }
+    .stars { display: flex; gap: 3px; margin-bottom: 8px; }
+    .star { width: 11px; height: 11px; border-radius: 2px; background: var(--amber); }
+    .star-empty { background: var(--border); }
+    .card-text { font-size: 13px; line-height: 1.65; color: var(--text-secondary); }
+    .card-badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+    .badge-ok  { background: var(--green-light); color: var(--green); }
+    .badge-ko  { background: var(--accent-light); color: var(--accent-dark); }
+    .badge-neu { background: var(--bg-secondary); color: var(--text-secondary); }
+    .card-footer-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-tertiary); padding-top: 8px; border-top: 0.5px solid var(--border); margin-top: 8px; align-items: center; }
+    .result-pill { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+    .pill-wait { background: var(--amber-light); color: #854F0B; }
+    .pill-refused { background: var(--accent-light); color: var(--accent-dark); }
+    .pill-hired { background: var(--green-light); color: var(--green); }
+    .pill-declined { background: var(--blue-light); color: var(--blue); }
+    .pill-abandoned { background: var(--bg-secondary); color: var(--text-secondary); }
+
+    /* PAGE ACCUEIL */
+    .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; padding: 5rem 2.5rem 4rem; max-width: 1100px; margin: 0 auto; align-items: start; }
+    .hero-tag { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-dark); background: var(--accent-light); padding: 4px 10px; border-radius: 20px; margin-bottom: 1.4rem; }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: 46px; line-height: 1.12; font-weight: 400; letter-spacing: -1.5px; margin-bottom: 1.3rem; }
+    .hero h1 em { font-style: italic; color: var(--accent); }
+    .hero-sub { font-size: 16px; line-height: 1.75; color: var(--text-secondary); margin-bottom: 2rem; max-width: 420px; }
+    .cta-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .hero-note { font-size: 12px; color: var(--text-tertiary); margin-top: 1rem; }
+    .card-stack { display: flex; flex-direction: column; }
+    .live-pill { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-secondary); background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: 20px; padding: 5px 12px; margin-bottom: 14px; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+
+    .loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* STATS */
+    .stats-bar { display: grid; grid-template-columns: repeat(3,1fr); border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); }
+    .stat-item { padding: 2.2rem 2rem; text-align: center; border-right: 0.5px solid var(--border); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-family: 'DM Serif Display', serif; font-size: 42px; font-weight: 400; line-height: 1; letter-spacing: -1.5px; }
+    .stat-num span { color: var(--accent); }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
+
+    /* HOW IT WORKS */
+    .section { max-width: 1100px; margin: 0 auto; padding: 3.5rem 2.5rem; }
+    .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 2rem; }
+    .how-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; }
+    .step-num { font-family: 'DM Serif Display', serif; font-size: 38px; font-weight: 400; color: var(--border-hover); line-height: 1; margin-bottom: 0.6rem; }
+    .step-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+    .step-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+
+    /* DUAL */
+    .dual { display: grid; grid-template-columns: 1fr 1fr; border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); }
+    .dual-col { padding: 3rem 2.5rem; }
+    .dual-col:first-child { border-right: 0.5px solid var(--border); }
+    .dual-tag { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem; }
+    .tag-cand { color: var(--green); }
+    .tag-rh   { color: var(--blue); }
+    .dual h3 { font-family: 'DM Serif Display', serif; font-size: 26px; font-weight: 400; line-height: 1.2; margin-bottom: 0.8rem; }
+    .dual p { font-size: 14px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 1.4rem; }
+    .feature-list { list-style: none; }
+    .feature-list li { font-size: 13px; color: var(--text-secondary); padding: 5px 0; display: flex; align-items: center; gap: 10px; }
+    .check { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+    .check-g { background: var(--green-light); color: var(--green); }
+    .check-b { background: var(--blue-light); color: var(--blue); }
+
+    /* FOOTER CTA */
+    .footer-cta { background: var(--bg-secondary); padding: 4rem 2.5rem; text-align: center; }
+    .footer-cta h2 { font-family: 'DM Serif Display', serif; font-size: 34px; font-weight: 400; letter-spacing: -0.5px; margin-bottom: 0.7rem; line-height: 1.2; }
+    .footer-cta p { font-size: 15px; color: var(--text-secondary); margin-bottom: 1.8rem; }
+    .footer-cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    footer { padding: 1.5rem 2.5rem; border-top: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-tertiary); }
+
+    /* PAGE AVIS */
+    .avis-header { padding: 2.5rem 2.5rem 0; max-width: 1100px; margin: 0 auto; }
+    .avis-header h1 { font-family: 'DM Serif Display', serif; font-size: 34px; font-weight: 400; letter-spacing: -1px; margin-bottom: 0.3rem; }
+    .avis-header p { font-size: 14px; color: var(--text-secondary); margin-bottom: 1.5rem; }
+    .search-row { display: flex; gap: 8px; padding: 0 2.5rem 1.5rem; max-width: 1100px; margin: 0 auto; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-md); background: var(--bg); color: var(--text); outline: none; }
+    .search-input:focus { border-color: var(--accent); }
+    .filter-sel { padding: 10px 30px 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; border: 0.5px solid var(--border-hover); border-radius: var(--radius-md); background: var(--bg); color: var(--text); cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+    .avis-list { max-width: 1100px; margin: 0 auto; padding: 1.5rem 2.5rem; }
+    .avis-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+    .avis-count-txt { font-size: 14px; color: var(--text-secondary); }
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-secondary); }
+    .empty-icon { font-size: 44px; margin-bottom: 1rem; }
+    .empty-state h3 { font-family: 'DM Serif Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 0.5rem; color: var(--text); }
+
+    /* PAGE CLASSEMENT */
+    .classement-hero { background: var(--bg-secondary); border-bottom: 0.5px solid var(--border); padding: 3rem 2.5rem; text-align: center; }
+    .classement-hero h1 { font-family: 'DM Serif Display', serif; font-size: 36px; font-weight: 400; letter-spacing: -1px; margin-bottom: 0.4rem; }
+    .classement-hero p { font-size: 14px; color: var(--text-secondary); }
+    .classement-body { max-width: 900px; margin: 0 auto; padding: 2rem 2.5rem 4rem; }
+    .rank-table { width: 100%; border-collapse: collapse; }
+    .rank-table th { font-size: 11px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-tertiary); padding: 8px 12px; text-align: left; border-bottom: 0.5px solid var(--border); }
+    .rank-table td { padding: 14px 12px; border-bottom: 0.5px solid var(--border); font-size: 14px; vertical-align: middle; }
+    .rank-table tr:last-child td { border-bottom: none; }
+    .rank-table tbody tr:hover td { background: var(--bg-secondary); }
+    .rank-num-cell { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text-tertiary); text-align: center; }
+    .co-cell { display: flex; align-items: center; gap: 10px; }
+    .co-logo-sm { width: 36px; height: 36px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; border: 0.5px solid var(--border); flex-shrink: 0; }
+    .co-name { font-weight: 500; }
+    .co-sector-txt { font-size: 12px; color: var(--text-secondary); }
+    .score-big { font-family: 'DM Serif Display', serif; font-size: 22px; }
+    .mini-stars { display: flex; gap: 2px; margin-top: 2px; }
+    .ms { width: 9px; height: 9px; border-radius: 1px; background: var(--amber); }
+    .ms-e { background: var(--border); }
+    .rate-g { color: var(--green); font-weight: 500; }
+    .rate-b { color: var(--accent); font-weight: 500; }
+    .no-data-row { text-align: center; padding: 3rem 1rem; color: var(--text-secondary); }
+
+    /* FORMULAIRE */
+    .form-wrap { max-width: 660px; margin: 0 auto; padding: 2.5rem 2.5rem 5rem; }
+    .form-title { font-family: 'DM Serif Display', serif; font-size: 34px; font-weight: 400; letter-spacing: -1px; margin-bottom: 0.4rem; }
+    .form-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 2rem; }
+    .progress-bar { display: flex; gap: 5px; margin-bottom: 2.5rem; }
+    .prog-step { height: 3px; flex: 1; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+    .prog-step.done { background: var(--green); }
+    .prog-step.active { background: var(--accent); }
+    .step-block { display: none; }
+    .step-block.visible { display: block; }
+    .step-lbl { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.3rem; }
+    .step-ttl { font-family: 'DM Serif Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 1.8rem; }
+    .form-group { margin-bottom: 1.3rem; }
+    .form-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; }
+    .form-hint { font-size: 12px; font-weight: 400; color: var(--text-tertiary); }
+    input[type=text], input[type=email], select, textarea { width: 100%; padding: 10px 13px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); border: 0.5px solid var(--border-hover); border-radius: var(--radius-md); outline: none; transition: border-color 0.15s; appearance: none; }
+    input[type=text]:focus, input[type=email]:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+    select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .star-rating { display: flex; gap: 8px; margin-top: 4px; }
+    .star-btn { width: 38px; height: 38px; border-radius: var(--radius-md); border: 0.5px solid var(--border-hover); background: var(--bg); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .star-btn:hover, .star-btn.active { background: var(--amber-light); border-color: var(--amber); }
+    .tag-grid { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 5px; }
+    .tag-opt { font-size: 12px; font-weight: 500; padding: 5px 12px; border: 0.5px solid var(--border-hover); border-radius: 20px; background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+    .tag-opt:hover { border-color: var(--text); color: var(--text); }
+    .tag-opt.sel-ok  { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .tag-opt.sel-ko  { background: var(--accent-light); border-color: var(--accent-dark); color: var(--accent-dark); }
+    .tag-opt.sel-one { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+    .form-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 0.5px solid var(--border); }
+    .btn-back-form { background: none; border: none; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-secondary); cursor: pointer; padding: 10px 0; }
+    .anon-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0.5px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-secondary); cursor: pointer; user-select: none; }
+    .toggle { width: 38px; height: 21px; border-radius: 11px; background: var(--green); position: relative; flex-shrink: 0; transition: background 0.2s; }
+    .toggle-knob { width: 17px; height: 17px; border-radius: 50%; background: white; position: absolute; top: 2px; right: 2px; transition: right 0.2s; }
+    .toggle.off { background: var(--border-hover); }
+    .toggle.off .toggle-knob { right: 19px; }
+    .error-msg { font-size: 12px; color: var(--accent); margin-top: 4px; display: none; }
+    .error-msg.show { display: block; }
+    input.err, select.err, textarea.err { border-color: var(--accent); }
+
+    /* SUCCÈS */
+    .success-page { text-align: center; padding: 5rem 2rem; }
+    .success-icon { width: 70px; height: 70px; border-radius: 50%; background: var(--green-light); margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--green); }
+    .success-page h2 { font-family: 'DM Serif Display', serif; font-size: 28px; font-weight: 400; margin-bottom: 0.6rem; }
+    .success-page p { font-size: 15px; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.7; }
+    .success-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.2rem; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; gap: 2.5rem; padding: 2.5rem 1.2rem 2rem; }
+      .hero h1 { font-size: 34px; }
+      .card-stack { display: none; }
+      .stats-bar { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 0.5px solid var(--border); padding: 1.5rem; }
+      .stat-item:last-child { border-bottom: none; }
+      .how-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .dual { grid-template-columns: 1fr; }
+      .dual-col:first-child { border-right: none; border-bottom: 0.5px solid var(--border); }
+      .section { padding: 2.5rem 1.2rem; }
+      .footer-cta { padding: 2.5rem 1.2rem; }
+      .footer-cta h2 { font-size: 26px; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+      .avis-header, .avis-list, .classement-body { padding-left: 1.2rem; padding-right: 1.2rem; }
+      .search-row { padding-left: 1.2rem; padding-right: 1.2rem; flex-direction: column; }
+      .form-wrap { padding: 2rem 1.2rem 4rem; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="logo" onclick="showPage('home')">Retour<span>net</span></span>
+  <ul class="nav-links">
+    <li><a id="nav-home" onclick="showPage('home')">Accueil</a></li>
+    <li><a id="nav-avis" onclick="showPage('avis')">Les avis</a></li>
+    <li><a id="nav-classement" onclick="showPage('classement')">Classement</a></li>
+  </ul>
+  <button class="btn-nav" onclick="showPage('form')">Laisser un avis</button>
+</nav>
+
+<!-- ═══ PAGE ACCUEIL ═══ -->
+<div class="page active" id="page-home">
+
+  <div class="hero">
+    <div>
+      <div class="hero-tag" id="hero-tag">Bêta ouverte en France</div>
+      <h1>Comment s'est passé l'entretien ?<br><em>Dites-le!</em></h1>
+      <p class="hero-sub">La première plateforme de feedback sur les processus de recrutement. Pour les candidats qui méritent un retour. Pour les entreprises qui veulent s'améliorer.</p>
+      <div class="cta-row">
+        <button class="btn-primary" onclick="showPage('form')">Partager mon expérience</button>
+        <button class="btn-secondary" onclick="showPage('avis')">Consulter les avis</button>
+      </div>
+      <p class="hero-note">Anonyme par défaut · Aucune inscription · Données sauvegardées dans ton navigateur</p>
+    </div>
+
+    <div class="card-stack">
+      <div class="live-pill">
+        <div class="live-dot"></div>
+        <span id="live-count">0 avis dans la base</span>
+      </div>
+      <div id="hero-cards"><div style="text-align:center;padding:2rem;color:var(--text-tertiary);font-size:14px;">Chargement…</div></div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num" id="stat-total">0</div>
+      <div class="stat-label">Avis déposés</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-companies">0</div>
+      <div class="stat-label">Entreprises référencées</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-avg">—</div>
+      <div class="stat-label">Note moyenne générale</div>
+    </div>
+  </div>
+
+  <div class="section" style="border-bottom:0.5px solid var(--border);">
+    <div class="section-label">Comment ça marche</div>
+    <div class="how-grid">
+      <div>
+        <div class="step-num">01</div>
+        <div class="step-title">Tu passes un entretien</div>
+        <div class="step-desc">Reçu ou refusé, peu importe. Tu as vécu quelque chose — ça compte et ça peut aider les autres.</div>
+      </div>
+      <div>
+        <div class="step-num">02</div>
+        <div class="step-title">Tu partages ton expérience</div>
+        <div class="step-desc">2 minutes, anonyme, sur le processus : délais, qualité des questions, feedback reçu ou non.</div>
+      </div>
+      <div>
+        <div class="step-num">03</div>
+        <div class="step-title">La communauté en profite</div>
+        <div class="step-desc">Les candidats préparent mieux leurs entretiens. Les entreprises voient leur score et progressent.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dual">
+    <div class="dual-col">
+      <div class="dual-tag tag-cand">Pour les candidats</div>
+      <h3>Prépare-toi vraiment</h3>
+      <p>Lis les témoignages réels de candidats qui ont passé un entretien chez l'entreprise qui t'intéresse. Sache à quoi t'attendre avant d'entrer dans la salle.</p>
+      <ul class="feature-list">
+        <li><div class="check check-g">✓</div> Avis anonymes vérifiés</li>
+        <li><div class="check check-g">✓</div> Durée et format des entretiens</li>
+        <li><div class="check check-g">✓</div> Types de questions posées</li>
+        <li><div class="check check-g">✓</div> Délais de réponse moyens</li>
+        <li><div class="check check-g">✓</div> Transparence sur les salaires proposés</li>
+      </ul>
+    </div>
+    <div class="dual-col">
+      <div class="dual-tag tag-rh">Pour les RH & recruteurs</div>
+      <h3>Améliore ta marque employeur</h3>
+      <p>Accède au tableau de bord de ton entreprise, suis ton score "expérience candidat" et identifie les frictions dans ton processus de recrutement.</p>
+      <ul class="feature-list">
+        <li><div class="check check-b">✓</div> Score global et par étape du process</li>
+        <li><div class="check check-b">✓</div> Alertes sur les avis négatifs</li>
+        <li><div class="check check-b">✓</div> Benchmark vs concurrents du secteur</li>
+        <li><div class="check check-b">✓</div> Badge "Bon recruteur" certifié</li>
+        <li><div class="check check-b">✓</div> Rapports mensuels téléchargeables</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-cta">
+    <h2>Le recrutement mérite mieux<br>que le silence.</h2>
+    <p id="footer-cta-sub">Sois parmi les premiers à partager ton expérience.</p>
+    <div class="footer-cta-row">
+      <button class="btn-primary" onclick="showPage('form')">Déposer un avis</button>
+      <button class="btn-secondary" onclick="showPage('classement')">Voir le classement des entreprises</button>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2025 Retournet · Fait en France</span>
+    <span>Données stockées localement · Aucun compte requis</span>
+  </footer>
+
+</div>
+
+<!-- ═══ PAGE AVIS ═══ -->
+<div class="page" id="page-avis">
+  <div class="avis-header">
+    <h1>Tous les avis</h1>
+    <p id="avis-subtitle">Chargement…</p>
+  </div>
+  <div class="search-row">
+    <input class="search-input" type="text" id="search-input" placeholder="Rechercher une entreprise, un poste, une ville…" oninput="filterAvis()">
+    <select class="filter-sel" id="filter-note" onchange="filterAvis()">
+      <option value="">Toutes les notes</option>
+      <option value="5">★★★★★ (5/5)</option>
+      <option value="4">★★★★☆ (4/5)</option>
+      <option value="3">★★★☆☆ (3/5)</option>
+      <option value="2">★★☆☆☆ (2/5)</option>
+      <option value="1">★☆☆☆☆ (1/5)</option>
+    </select>
+    <select class="filter-sel" id="filter-result" onchange="filterAvis()">
+      <option value="">Tous les résultats</option>
+      <option value="Refusé après entretien">Refusés</option>
+      <option value="J'ai reçu une offre">Offre reçue</option>
+      <option value="En attente de réponse">En attente</option>
+      <option value="J'ai décliné l'offre">Offre déclinée</option>
+    </select>
+    <select class="filter-sel" id="filter-sort" onchange="filterAvis()">
+      <option value="recent">Plus récents</option>
+      <option value="best">Mieux notés</option>
+      <option value="worst">Moins bien notés</option>
+    </select>
+  </div>
+  <div class="avis-list">
+    <div class="avis-list-header">
+      <span class="avis-count-txt" id="avis-count-txt"></span>
+      <button class="btn-primary" onclick="showPage('form')" style="font-size:13px;padding:8px 16px;">+ Ajouter un avis</button>
+    </div>
+    <div id="avis-container"></div>
+  </div>
+</div>
+
+<!-- ═══ PAGE CLASSEMENT ═══ -->
+<div class="page" id="page-classement">
+  <div class="classement-hero">
+    <h1>Classement des recruteurs</h1>
+    <p>Entreprises classées par note moyenne · mis à jour en temps réel depuis tes avis</p>
+  </div>
+  <div class="classement-body">
+    <table class="rank-table">
+      <thead>
+        <tr>
+          <th style="width:50px;text-align:center">#</th>
+          <th>Entreprise</th>
+          <th>Score</th>
+          <th>Avis</th>
+          <th>Taux feedback</th>
+          <th>Ghosting</th>
+        </tr>
+      </thead>
+      <tbody id="classement-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ PAGE FORMULAIRE ═══ -->
+<div class="page" id="page-form">
+  <div class="form-wrap">
+    <div id="form-main">
+      <h1 class="form-title">Partage ton expérience</h1>
+      <p class="form-sub">Anonyme · 3 étapes · environ 3 minutes. Ton avis sera immédiatement visible.</p>
+
+      <div class="progress-bar">
+        <div class="prog-step active" id="prog1"></div>
+        <div class="prog-step" id="prog2"></div>
+        <div class="prog-step" id="prog3"></div>
+      </div>
+
+      <!-- ÉTAPE 1 -->
+      <div class="step-block visible" id="step1">
+        <div class="step-lbl">Étape 1 sur 3</div>
+        <div class="step-ttl">L'entreprise et le poste</div>
+        <div class="form-group">
+          <label class="form-label">Nom de l'entreprise *</label>
+          <input type="text" id="f-company" placeholder="Ex : Renault, Décathlon, BNP Paribas…">
+          <div class="error-msg" id="err-company">Ce champ est requis.</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Secteur d'activité</label>
+            <select id="f-sector">
+              <option value="">Sélectionner…</option>
+              <option>Automobile / Mobilité</option>
+              <option>Industrie / Manufacturing</option>
+              <option>Tech / Digital</option>
+              <option>Finance / Banque</option>
+              <option>Retail / Distribution</option>
+              <option>Santé / Pharma</option>
+              <option>Conseil / Services</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ville de l'entretien</label>
+            <input type="text" id="f-city" placeholder="Ex : Lyon, Paris, Genève…">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Intitulé du poste *</label>
+          <input type="text" id="f-poste" placeholder="Ex : Ingénieur qualité, Chef de projet, Technicien SAV…">
+          <div class="error-msg" id="err-poste">Ce champ est requis.</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Type de contrat</label>
+            <select id="f-contract">
+              <option>CDI</option><option>CDD</option><option>Stage</option>
+              <option>Alternance</option><option>Freelance / Mission</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quand a eu lieu l'entretien ?</label>
+            <select id="f-when">
+              <option>Cette semaine</option><option>Ce mois-ci</option>
+              <option>Il y a 1 à 3 mois</option><option>Il y a plus de 3 mois</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Résultat de ta candidature</label>
+          <div class="tag-grid" id="tags-result"></div>
+        </div>
+        <div class="form-nav">
+          <button class="btn-back-form" onclick="showPage('home')">← Annuler</button>
+          <button class="btn-primary" onclick="goStep(2)">Continuer →</button>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 2 -->
+      <div class="step-block" id="step2">
+        <div class="step-lbl">Étape 2 sur 3</div>
+        <div class="step-ttl">Le déroulé du processus</div>
+        <div class="form-group">
+          <label class="form-label">Note globale du processus *</label>
+          <div class="star-rating">
+            <button class="star-btn" onclick="setStars(1)">★</button>
+            <button class="star-btn" onclick="setStars(2)">★</button>
+            <button class="star-btn" onclick="setStars(3)">★</button>
+            <button class="star-btn" onclick="setStars(4)">★</button>
+            <button class="star-btn" onclick="setStars(5)">★</button>
+          </div>
+          <div class="error-msg" id="err-stars">Sélectionne une note.</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nombre d'entretiens</label>
+            <select id="f-nbentretiens">
+              <option>1 entretien</option><option>2 entretiens</option>
+              <option>3 entretiens</option><option>4 ou plus</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Délai de réponse</label>
+            <select id="f-delai">
+              <option>Moins de 48h</option><option>2 à 7 jours</option>
+              <option>1 à 3 semaines</option><option>Plus d'un mois</option>
+              <option>Aucune réponse</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Points positifs <span class="form-hint">(plusieurs possibles)</span></label>
+          <div class="tag-grid" id="tags-pos"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Points négatifs <span class="form-hint">(plusieurs possibles)</span></label>
+          <div class="tag-grid" id="tags-neg"></div>
+        </div>
+        <div class="form-nav">
+          <button class="btn-back-form" onclick="goStep(1)">← Retour</button>
+          <button class="btn-primary" onclick="goStep(3)">Continuer →</button>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 3 -->
+      <div class="step-block" id="step3">
+        <div class="step-lbl">Étape 3 sur 3</div>
+        <div class="step-ttl">Ton témoignage</div>
+        <div class="form-group">
+          <label class="form-label">Raconte ton expérience *</label>
+          <textarea id="f-text" placeholder="Décris le déroulé de ton entretien, ce qui s'est bien passé, ce qui t'a surpris ou déçu. Plus c'est précis, plus c'est utile pour les autres candidats."></textarea>
+          <div class="error-msg" id="err-text">Partage au moins quelques mots (10 caractères minimum).</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Conseil pour les prochains candidats <span class="form-hint">(optionnel)</span></label>
+          <textarea id="f-conseil" placeholder="Ex : Prépare des exemples concrets de projets, attends-toi à un test technique…" style="min-height:80px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Anonymat</label>
+          <div class="anon-row" onclick="toggleAnon()">
+            <div class="toggle" id="anon-toggle"><div class="toggle-knob"></div></div>
+            <div>
+              <div style="font-size:13px;font-weight:500;" id="anon-label">Publier de façon anonyme</div>
+              <div style="font-size:12px;color:var(--text-secondary);">Ton nom ne sera jamais affiché. Seule l'entreprise et le poste seront visibles.</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-nav">
+          <button class="btn-back-form" onclick="goStep(2)">← Retour</button>
+          <button class="btn-green" id="submit-btn" onclick="submitAvis()">Publier mon avis ✓</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUCCÈS -->
+    <div class="success-page" id="form-success" style="display:none;">
+      <div class="success-icon">✓</div>
+      <h2>Merci pour ton témoignage !</h2>
+      <p>Ton avis est maintenant visible par tous.<br>Tu aides d'autres candidats à mieux se préparer.</p>
+      <div class="success-btns">
+        <button class="btn-secondary" onclick="showPage('avis')">Voir tous les avis</button>
+        <button class="btn-primary" onclick="resetForm(); showPage('home')">Retour à l'accueil</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ SUPABASE CONFIG ══
+const SUPABASE_URL = 'https://cogpnmhcdaeahjytmtgs.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNvZ3BubWhjZGFlYWhqeXRtdGdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTkxODcsImV4cCI6MjA5MDc5NTE4N30.TDfPqHtScd7CbhRAU9bCLnqIjMM_sa3zJmDNcXR09FY';
+const H = {'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
+let _cache=[], _lastFetch=0;
+
+async function getAvis(force=false){
+  if(!force && _cache.length && Date.now()-_lastFetch<30000) return _cache;
+  const r=await fetch(SUPABASE_URL+'/rest/v1/avis?order=created_at.desc&limit=500',{headers:H});
+  if(!r.ok) throw new Error('Erreur chargement');
+  _cache=await r.json(); _lastFetch=Date.now(); return _cache;
+}
+
+async function insertDB(data){
+  const r=await fetch(SUPABASE_URL+'/rest/v1/avis',{method:'POST',headers:{...H,'Prefer':'return=minimal'},body:JSON.stringify(data)});
+  if(!r.ok){const e=await r.text();throw new Error(e);}
+}
+
+function rowToCard(r){
+  return{company:r.company,poste:r.poste,city:r.city,sector:r.sector,contract:r.contract,
+    result:r.result,stars:r.stars,nbEntretiens:r.nb_entretiens,delai:r.delai,
+    tagsPos:r.tags_pos||[],tagsNeg:r.tags_neg||[],text:r.texte,conseil:r.conseil,date:r.created_at};
+}
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const nav=document.getElementById('nav-'+p); if(nav) nav.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(p==='home') renderHome();
+  if(p==='avis') renderAvis();
+  if(p==='classement') renderClassement();
+  if(p==='form') resetForm();
+}
+
+function timeAgo(iso) {
+  const m=Math.floor((Date.now()-new Date(iso))/60000);
+  const h=Math.floor(m/60), d=Math.floor(h/24);
+  if(m<2) return "à l'instant";
+  if(m<60) return `il y a ${m} min`;
+  if(h<24) return `il y a ${h}h`;
+  if(d===1) return 'hier';
+  if(d<30) return `il y a ${d} jours`;
+  return `il y a ${Math.floor(d/30)} mois`;
+}
+
+function starsHTML(n,sz=11) {
+  return '<div class="stars">'+[1,2,3,4,5].map(i=>`<div class="${i<=n?'star':'star-empty'}" style="width:${sz}px;height:${sz}px"></div>`).join('')+'</div>';
+}
+
+function initials(s){ return (s||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]?.toUpperCase()||'').join(''); }
+
+const COLORS=[
+  {bg:'#E1F5EE',color:'#0F6E56'},{bg:'#E6F1FB',color:'#185FA5'},
+  {bg:'#FAEEDA',color:'#854F0B'},{bg:'#EEEDFE',color:'#3C3489'},
+  {bg:'#FAECE7',color:'#993C1D'},{bg:'#EAF3DE',color:'#3B6D11'},
+];
+function colorFor(s){ let h=0; for(let c of(s||'')) h=(h*31+c.charCodeAt(0))%COLORS.length; return COLORS[Math.abs(h)]; }
+
+function resultPill(r){
+  const m={'En attente de réponse':'pill-wait','Refusé après entretien':'pill-refused',"J'ai reçu une offre":'pill-hired',"J'ai décliné l'offre":'pill-declined','Processus abandonné':'pill-abandoned'};
+  return r?`<span class="result-pill ${m[r]||'pill-abandoned'}">${esc(r)}</span>`:'';
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderCard(a){
+  const col=colorFor(a.company);
+  const pos=(a.tagsPos||[]).slice(0,2).map(t=>`<span class="badge badge-ok">${esc(t)}</span>`).join('');
+  const neg=(a.tagsNeg||[]).slice(0,2).map(t=>`<span class="badge badge-ko">${esc(t)}</span>`).join('');
+  const neu=a.nbEntretiens?`<span class="badge badge-neu">${esc(a.nbEntretiens)}</span>`:'';
+  return `<div class="review-card">
+    <div class="card-header">
+      <div class="avatar" style="background:${col.bg};color:${col.color}">${initials(a.company)}</div>
+      <div>
+        <div class="card-company">${esc(a.company)}${a.poste?' — '+esc(a.poste):''}</div>
+        <div class="card-meta-sub">${timeAgo(a.date)}${a.city?' · '+esc(a.city):''}${a.contract?' · '+esc(a.contract):''}</div>
+      </div>
+    </div>
+    ${starsHTML(a.stars)}
+    ${(pos||neg||neu)?`<div class="card-badges">${pos}${neg}${neu}</div>`:''}
+    <div class="card-text">"${esc(a.text)}"</div>
+    ${a.conseil?`<div style="font-size:12px;color:var(--text-tertiary);margin-top:6px;">💡 Conseil : ${esc(a.conseil)}</div>`:''}
+    <div class="card-footer-row">
+      <div style="display:flex;gap:8px;align-items:center;">${resultPill(a.result)}<span>${esc(a.delai||'')}</span></div>
+      <span>${esc(a.sector||'')}</span>
+    </div>
+  </div>`;
+}
+
+async function renderHome(){
+  let all=[];
+  try{ const rows=await getAvis(); all=rows.map(rowToCard); }catch(e){
+    document.getElementById('hero-cards').innerHTML='<div style="color:var(--accent);font-size:13px;padding:1rem;">Erreur de connexion à la base de données.</div>'; return; }
+  const n=all.length;
+  document.getElementById('live-count').textContent=n+' avis dans la base';
+  document.getElementById('stat-total').textContent=n;
+  const cos=new Set(all.map(a=>(a.company||'').trim().toLowerCase()).filter(Boolean));
+  document.getElementById('stat-companies').textContent=cos.size;
+  const avg=n?(all.reduce((s,a)=>s+(a.stars||0),0)/n).toFixed(1):'—';
+  document.getElementById('stat-avg').innerHTML=n?`${avg}<span>/5</span>`:'—';
+  document.getElementById('hero-tag').textContent=n===0?'Bêta — sois le premier !':
+    `${n} avis · ${cos.size} entreprise${cos.size>1?'s':''} référencée${cos.size>1?'s':''}`;
+  document.getElementById('footer-cta-sub').textContent=n===0?'Sois parmi les premiers à partager ton expérience.':
+    `Rejoins les ${n} candidat${n>1?'s':''} qui ont déjà partagé leur expérience.`;
+  const heroCards=document.getElementById('hero-cards');
+  heroCards.innerHTML=n===0?`<div style="text-align:center;padding:2.5rem 1.5rem;color:var(--text-tertiary);font-size:14px;border:0.5px dashed var(--border);border-radius:var(--radius-lg);line-height:1.8;">Les premiers avis apparaîtront ici.<br><button class="btn-primary" onclick="showPage('form')" style="margin-top:1rem;font-size:13px;padding:9px 18px;">Sois le premier →</button></div>`:
+    all.slice(0,3).map(renderCard).join('');
+}
+
+function filterAvis(){
+  const q=(document.getElementById('search-input').value||'').toLowerCase();
+  const note=document.getElementById('filter-note').value;
+  const result=document.getElementById('filter-result').value;
+  const sort=document.getElementById('filter-sort').value;
+  let list=getAvis();
+  if(q) list=list.filter(a=>[(a.company||''),(a.poste||''),(a.city||''),(a.text||''),(a.sector||'')].some(s=>s.toLowerCase().includes(q)));
+  if(note) list=list.filter(a=>a.stars==parseInt(note));
+  if(result) list=list.filter(a=>a.result===result);
+  if(sort==='best') list.sort((a,b)=>b.stars-a.stars);
+  else if(sort==='worst') list.sort((a,b)=>a.stars-b.stars);
+  document.getElementById('avis-count-txt').textContent=`${list.length} avis trouvé${list.length>1?'s':''}`;
+  const c=document.getElementById('avis-container');
+  c.innerHTML=list.length===0?`<div class="empty-state"><div class="empty-icon">🔍</div><h3>Aucun avis trouvé</h3><p style="margin-top:.5rem">Essaie d'autres mots-clés ou <button class="btn-primary" onclick="showPage('form')" style="font-size:13px;padding:7px 14px;margin-left:4px;">laisse le premier avis</button></p></div>`:list.map(renderCard).join('');
+}
+
+async function renderAvis(){
+  document.getElementById('avis-container').innerHTML='<div style="text-align:center;padding:3rem;color:var(--text-tertiary);">Chargement…</div>';
+  try{
+    const rows=await getAvis(true);
+    window._allAvis=rows.map(rowToCard);
+    document.getElementById('avis-subtitle').textContent=`${window._allAvis.length} témoignage${window._allAvis.length>1?'s':''} · mis à jour en temps réel`;
+  }catch(e){
+    document.getElementById('avis-container').innerHTML='<div style="color:var(--accent);padding:2rem;text-align:center;">Erreur de connexion.</div>';
+    return;
+  }
+  ['search-input','filter-note','filter-result'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('filter-sort').value='recent';
+  filterAvis();
+}
+
+async function renderClassement(){
+  const tbody=document.getElementById('classement-body');
+  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-tertiary);">Chargement…</td></tr>';
+  let rows=[];
+  try{ rows=await getAvis(); }catch(e){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--accent);">Erreur de connexion.</td></tr>'; return; }
+  const all=rows.map(rowToCard);
+  if(!all.length){ tbody.innerHTML=`<tr><td colspan="6" class="no-data-row">Aucun avis pour l'instant.<br><button class="btn-primary" onclick="showPage('form')" style="font-size:13px;padding:8px 16px;margin-top:.8rem;">Laisser le premier avis</button></td></tr>`; return; }
+  const map={};
+  for(const a of all){ const k=(a.company||'?').trim(); if(!map[k]) map[k]={name:k,sector:a.sector||'',avis:[]}; map[k].avis.push(a); }
+  const cos=Object.values(map).map(c=>{
+    const avg=c.avis.reduce((s,a)=>s+(a.stars||0),0)/c.avis.length;
+    const fp=Math.round(c.avis.filter(a=>(a.tagsPos||[]).includes('Feedback reçu')).length/c.avis.length*100);
+    const gp=Math.round(c.avis.filter(a=>(a.tagsNeg||[]).includes('Ghosting')).length/c.avis.length*100);
+    return{...c,avg:avg.toFixed(1),avgR:avg,fp,gp,count:c.avis.length};
+  }).sort((a,b)=>b.avgR-a.avgR);
+  const medals=['🥇','🥈','🥉'];
+  tbody.innerHTML=cos.map((c,i)=>{
+    const col=colorFor(c.name);
+    const rank=i<3?medals[i]:i+1;
+    const ms='<div class="mini-stars">'+[1,2,3,4,5].map(j=>`<div class="${j<=Math.round(parseFloat(c.avg))?'ms':'ms-e'}"></div>`).join('')+'</div>';
+    return `<tr>
+      <td class="rank-num-cell">${rank}</td>
+      <td><div class="co-cell"><div class="co-logo-sm" style="background:${col.bg};color:${col.color}">${initials(c.name)}</div><div><div class="co-name">${esc(c.name)}</div><div class="co-sector-txt">${esc(c.sector)}</div></div></div></td>
+      <td><div class="score-big">${c.avg}</div>${ms}</td>
+      <td>${c.count}</td>
+      <td class="${c.fp>=50?'rate-g':'rate-b'}">${c.fp}%</td>
+      <td class="${c.gp>30?'rate-b':'rate-g'}">${c.gp}%</td>
+    </tr>`;
+  }).join('');
+}
+
+// FORMULAIRE
+let curStep=1, selStars=0, isAnon=true;
+const RESULT_OPTS=['En attente de réponse','Refusé après entretien',"J'ai reçu une offre","J'ai décliné l'offre",'Processus abandonné'];
+const POS_OPTS=['Feedback reçu','Questions pertinentes','Recruteur à l\'écoute','Salaire transparent','Réponse rapide','Bonne organisation','Présentation claire du poste'];
+const NEG_OPTS=['Pas de feedback','Questions hors sujet','Désorganisation','Entretien annulé','Salaire non communiqué','Longue attente','Ghosting','Questions discriminatoires'];
+
+function buildTags(id,opts,type){
+  const el=document.getElementById(id); if(!el) return;
+  el.innerHTML=opts.map(o=>`<button type="button" class="tag-opt" data-val="${esc(o)}" data-type="${type}" onclick="toggleTag(this,'${type}')">${esc(o)}</button>`).join('');
+}
+function toggleTag(el,type){
+  if(type==='result'){document.querySelectorAll('[data-type="result"]').forEach(b=>b.classList.remove('sel-one'));el.classList.add('sel-one');}
+  else if(type==='pos') el.classList.toggle('sel-ok');
+  else el.classList.toggle('sel-ko');
+}
+function getSelTags(type){const cls=type==='pos'?'sel-ok':type==='neg'?'sel-ko':'sel-one';return[...document.querySelectorAll(`[data-type="${type}"].${cls}`)].map(b=>b.dataset.val);}
+function setStars(n){selStars=n;document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('active',i<n));}
+function toggleAnon(){isAnon=!isAnon;document.getElementById('anon-toggle').classList.toggle('off',!isAnon);document.getElementById('anon-label').textContent=isAnon?'Publier de façon anonyme':'Publier avec mon prénom';}
+function showErr(id,iid){document.getElementById(id).classList.add('show');if(iid)document.getElementById(iid).classList.add('err');}
+function hideErr(id,iid){document.getElementById(id).classList.remove('show');if(iid)document.getElementById(iid).classList.remove('err');}
+
+function goStep(n){
+  if(n>1&&curStep===1){
+    let ok=true;
+    if(!document.getElementById('f-company').value.trim()){showErr('err-company','f-company');ok=false;}else hideErr('err-company','f-company');
+    if(!document.getElementById('f-poste').value.trim()){showErr('err-poste','f-poste');ok=false;}else hideErr('err-poste','f-poste');
+    if(!ok) return;
+  }
+  if(n>2&&curStep===2){if(!selStars){showErr('err-stars');return;}hideErr('err-stars');}
+  document.getElementById('step'+curStep).classList.remove('visible');
+  document.getElementById('step'+n).classList.add('visible');
+  for(let i=1;i<=3;i++){const p=document.getElementById('prog'+i);p.classList.remove('active','done');if(i<n)p.classList.add('done');if(i===n)p.classList.add('active');}
+  curStep=n; window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function submitAvis(){
+  const texte=(document.getElementById('f-text').value||'').trim();
+  if(texte.length<10){showErr('err-text','f-text');return;}hideErr('err-text','f-text');
+
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true; btn.textContent='Publication…';
+
+  try{
+    await insertDB({
+      company:      document.getElementById('f-company').value.trim(),
+      sector:       document.getElementById('f-sector').value||null,
+      city:         document.getElementById('f-city').value.trim()||null,
+      poste:        document.getElementById('f-poste').value.trim(),
+      contract:     document.getElementById('f-contract').value,
+      result:       getSelTags('result')[0]||null,
+      stars:        selStars||null,
+      nb_entretiens:document.getElementById('f-nbentretiens').value,
+      delai:        document.getElementById('f-delai').value,
+      tags_pos:     getSelTags('pos'),
+      tags_neg:     getSelTags('neg'),
+      texte:        texte,
+      conseil:      document.getElementById('f-conseil').value.trim()||null,
+      anon:         isAnon,
+    });
+    _cache=[]; _lastFetch=0;
+    document.getElementById('form-main').style.display='none';
+    document.getElementById('form-success').style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(e){
+    console.error('Erreur Supabase:', e);
+    alert('Erreur lors de la publication : ' + e.message + '\nVérifie ta connexion et réessaie.');
+    btn.disabled=false; btn.textContent='Publier mon avis ✓';
+  }
+}
+
+function resetForm(){
+  curStep=1;selStars=0;isAnon=true;
+  document.getElementById('form-main').style.display='block';
+  document.getElementById('form-success').style.display='none';
+  ['step1','step2','step3'].forEach((id,i)=>{const e=document.getElementById(id);e.classList.toggle('visible',i===0);});
+  for(let i=1;i<=3;i++){const p=document.getElementById('prog'+i);p.classList.remove('active','done');if(i===1)p.classList.add('active');}
+  ['f-company','f-poste','f-city','f-text','f-conseil'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.querySelectorAll('.tag-opt').forEach(b=>b.classList.remove('sel-ok','sel-ko','sel-one'));
+  document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.error-msg').forEach(e=>e.classList.remove('show'));
+  document.querySelectorAll('.err').forEach(e=>e.classList.remove('err'));
+  document.getElementById('anon-toggle').classList.remove('off');
+  document.getElementById('anon-label').textContent='Publier de façon anonyme';
+}
+
+// INIT
+buildTags('tags-result',RESULT_OPTS,'result');
+buildTags('tags-pos',POS_OPTS,'pos');
+buildTags('tags-neg',NEG_OPTS,'neg');
+renderHome();
+</script>
+</body>
+</html>
