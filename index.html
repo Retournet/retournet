@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Retournet — Le feedback que les candidats méritent</title>
+  <title>Retournet — Avis sur les processus de recrutement en France</title>
+  <meta name="description" content="Retournet : la plateforme de feedback sur les entretiens d'embauche. Consultez et partagez des avis anonymes sur les processus de recrutement des entreprises françaises.">
+  <meta name="keywords" content="avis entretien embauche, feedback recrutement, processus recrutement entreprises, candidats, RH, emploi France">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Retournet — Le feedback que les candidats méritent">
+  <meta property="og:description" content="Partagez et consultez des avis anonymes sur les entretiens d'embauche en France. Préparez-vous mieux, recrutez mieux.">
+  <meta property="og:url" content="https://retournet.github.io/retournet">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://retournet.github.io/retournet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
@@ -260,7 +268,7 @@
   <div class="hero">
     <div>
       <div class="hero-tag" id="hero-tag">Bêta ouverte en France</div>
-      <h1>Comment s'est passé l'entretien ?<br><em>Dites-le!</em></h1>
+      <h1>L'entretien s'est mal passé ?<br><em>Dites-le.</em></h1>
       <p class="hero-sub">La première plateforme de feedback sur les processus de recrutement. Pour les candidats qui méritent un retour. Pour les entreprises qui veulent s'améliorer.</p>
       <div class="cta-row">
         <button class="btn-primary" onclick="showPage('form')">Partager mon expérience</button>
@@ -697,15 +705,17 @@ function filterAvis(){
   const note=document.getElementById('filter-note').value;
   const result=document.getElementById('filter-result').value;
   const sort=document.getElementById('filter-sort').value;
-  let list=getAvis();
+  // Utiliser le cache local chargé par renderAvis
+  let list=[...(window._allAvis||[])];
   if(q) list=list.filter(a=>[(a.company||''),(a.poste||''),(a.city||''),(a.text||''),(a.sector||'')].some(s=>s.toLowerCase().includes(q)));
   if(note) list=list.filter(a=>a.stars==parseInt(note));
   if(result) list=list.filter(a=>a.result===result);
   if(sort==='best') list.sort((a,b)=>b.stars-a.stars);
   else if(sort==='worst') list.sort((a,b)=>a.stars-b.stars);
-  document.getElementById('avis-count-txt').textContent=`${list.length} avis trouvé${list.length>1?'s':''}`;
+  const n=list.length;
+  document.getElementById('avis-count-txt').textContent=`${n} avis trouvé${n>1?'s':''}`;
   const c=document.getElementById('avis-container');
-  c.innerHTML=list.length===0?`<div class="empty-state"><div class="empty-icon">🔍</div><h3>Aucun avis trouvé</h3><p style="margin-top:.5rem">Essaie d'autres mots-clés ou <button class="btn-primary" onclick="showPage('form')" style="font-size:13px;padding:7px 14px;margin-left:4px;">laisse le premier avis</button></p></div>`:list.map(renderCard).join('');
+  c.innerHTML=n===0?`<div class="empty-state"><div class="empty-icon">🔍</div><h3>Aucun avis trouvé</h3><p style="margin-top:.5rem">Essaie d'autres mots-clés ou <button class="btn-primary" onclick="showPage('form')" style="font-size:13px;padding:7px 14px;margin-left:4px;">laisse le premier avis</button></p></div>`:list.map(renderCard).join('');
 }
 
 async function renderAvis(){
